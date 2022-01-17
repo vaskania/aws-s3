@@ -56,11 +56,13 @@ paths:
         type: aws
   /upload:
     post:
+      consumes:
+      - multipart/form-data
       produces:
       - application/json
       parameters:
-      - name: Content-Type
-        in: header
+      - name: file
+        in: formData
         required: false
         type: string
       responses:
