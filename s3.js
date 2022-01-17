@@ -1,4 +1,4 @@
-const S3 = require("aws-sdk/clients/s3");
+const S3 = require('aws-sdk/clients/s3');
 
 const bucketName = process.env.AWS_BUCKET;
 const region = process.env.AWS_REGION;
@@ -20,7 +20,7 @@ const uploadFile = (file) => {
     Key: `${Date.now().toString()}-${file.originalname}`,
   };
 
-  return s3.upload(uploadParams).promise()
+  return s3.upload(uploadParams).promise();
 };
 
 // downloads a file from s3
