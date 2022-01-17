@@ -13,13 +13,12 @@ const s3 = new S3({
 
 // Uploads a file to s3
 
-const uploadFile = (file) => {
+const uploadFile = async (file) => {
   const uploadParams = {
     Bucket: bucketName,
     Body: file.buffer,
-    Key: `${Date.now().toString()}-${file.originalname}`,
+    Key: `${file.fieldname}/${Date.now().toString()}-${file.originalname}`,
   };
-
   return s3.upload(uploadParams).promise();
 };
 
