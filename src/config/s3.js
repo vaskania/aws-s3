@@ -13,11 +13,11 @@ const s3 = new S3({
 
 // Uploads a file to s3
 
-const uploadFile = async (file) => {
+const uploadFile = (file, fieldname) => {
   const uploadParams = {
     Bucket: bucketName,
     Body: file.buffer,
-    Key: `${file.fieldname}/${Date.now().toString()}-${file.originalname}`,
+    Key: `${fieldname}${Date.now().toString()}-${file.originalname}`,
   };
   return s3.upload(uploadParams).promise();
 };
@@ -25,12 +25,44 @@ const uploadFile = async (file) => {
 // downloads a file from s3
 
 const downloadFile = (filename) => {
-  const downloadParams = {
+  const params = {
     Key: filename,
     Bucket: bucketName,
   };
 
-  return s3.getObject(downloadParams).promise();
+  return s3.getObject(params).createReadStream();
 };
 
-module.exports = { uploadFile, downloadFile };
+// list files or folders
+
+const getList = async (prefix) => {
+  const params = {
+    Bucket: bucketName,
+    Prefix: `${prefix}/`,
+    Delimiter: '/',
+  };
+
+  const list = await s3.listObjectsV2(params).promise();
+  const result = list.Contents.map((item) => {
+    const file = item.Key.split(prefix);
+    return file[1];
+  });
+  return result;
+};
+
+// Get file stat
+
+const getStats = async (filename) => {
+  const params = {
+    Key: filename,
+    Bucket: bucketName,
+  };
+  return s3.getObject(params).promise();
+};
+
+module.exports = {
+  uploadFile,
+  downloadFile,
+  getList,
+  getStats,
+};
