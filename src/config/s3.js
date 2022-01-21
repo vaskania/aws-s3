@@ -57,7 +57,7 @@ const getStats = async (filename) => {
     Key: filename,
     Bucket: bucketName,
   };
-  return s3.getObject(params).promise();
+  return s3.headObject(params).promise();
 };
 
 module.exports = {
