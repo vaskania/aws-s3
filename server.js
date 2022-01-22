@@ -8,6 +8,18 @@ const port = process.env.PORT;
 
 app.use(router);
 
-app.listen(port, () => {
+const server = app.listen(port, () => {
   logger.info('Server is running');
 });
+
+const shutdown = () => {
+  logger.info('Clossing server');
+  server.close(() => {
+    logger.info('Server closed.');
+    process.exit(0);
+  });
+};
+
+process.on('SIGINT', shutdown);
+
+process.on('SIGTERM', shutdown);
