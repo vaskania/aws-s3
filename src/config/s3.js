@@ -13,11 +13,11 @@ const s3 = new S3({
 
 // Uploads a file to s3
 
-const uploadFile = (file, fieldname) => {
+const uploadFile = (file) => {
   const uploadParams = {
     Bucket: bucketName,
     Body: file.buffer,
-    Key: `${fieldname}${Date.now().toString()}-${file.originalname}`,
+    Key: `${file.fieldname}${Date.now().toString()}-${file.originalname}`,
   };
   return s3.upload(uploadParams).promise();
 };
@@ -38,7 +38,7 @@ const downloadFile = (filename) => {
 const getList = async (prefix) => {
   const params = {
     Bucket: bucketName,
-    Prefix: `${prefix}/`,
+    Prefix: `${prefix}`,
     Delimiter: '/',
   };
 
@@ -57,6 +57,7 @@ const getStats = async (filename) => {
     Key: filename,
     Bucket: bucketName,
   };
+
   return s3.headObject(params).promise();
 };
 

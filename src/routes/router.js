@@ -1,5 +1,6 @@
 const express = require('express');
 const multer = require('multer');
+const bodyParser = require('body-parser');
 
 const router = express.Router();
 const logger = require('../log/logger');
@@ -12,12 +13,13 @@ const storage = multer.memoryStorage({
 });
 
 const upload = multer({ storage });
+router.use(bodyParser.json());
+router.use(bodyParser.urlencoded({ extended: true }));
 
 router.get('/open', (req, res, next) => {
   try {
-    const [destination] = Object.keys(req.query);
-    const [filename] = Object.values(req.query);
-    const data = downloadFile(`${destination}${filename}`);
+    const filePath = req.query.path;
+    const data = downloadFile(filePath);
     data.on('error', (err) => res.status(err.statusCode).send(err)).pipe(res);
   } catch (error) {
     logger.error(error);
@@ -28,8 +30,7 @@ router.get('/open', (req, res, next) => {
 router.post('/create', upload.any(), async (req, res, next) => {
   try {
     const [file] = req.files;
-    const [destination] = Object.keys(req.query);
-    const result = await uploadFile(file, destination);
+    const result = await uploadFile(file);
     res.send({ filePath: `${result.Key}` });
   } catch (error) {
     logger.error(error);
@@ -39,8 +40,8 @@ router.post('/create', upload.any(), async (req, res, next) => {
 
 router.get('/list', async (req, res, next) => {
   try {
-    const [destination] = Object.keys(req.query);
-    const list = await getList(destination);
+    const filePath = req.query.path;
+    const list = await getList(filePath);
     res.send(list);
   } catch (error) {
     logger.error(error);
@@ -50,9 +51,8 @@ router.get('/list', async (req, res, next) => {
 
 router.get('/stats', async (req, res, next) => {
   try {
-    const [destination] = Object.keys(req.query);
-    const [filename] = Object.values(req.query);
-    const fileStat = await getStats(`${destination}${filename}`);
+    const filePath = req.query.path;
+    const fileStat = await getStats(filePath);
     res.send({
       LastModified: fileStat.LastModified,
       Size: fileStat.ContentLength,
